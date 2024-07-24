@@ -15,6 +15,8 @@ public class Reservation {
 
 	public static final String RESERVATION_STATUS_CONSUME = "consume";
 
+	public static final String RESERVATION_STATUS_CANCEL = "cancel";  //change
+
 	private String reservationNumber;
 
 	private Date stayingDate;

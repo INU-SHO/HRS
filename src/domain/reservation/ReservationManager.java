@@ -70,6 +70,41 @@ public class ReservationManager {
 		return stayingDate;
 	}
 
+	public Date cancelReservation(String reservationNumber) throws ReservationException,
+			NullPointerException {
+		if (reservationNumber == null) {
+			throw new NullPointerException("reservationNumber");
+		}
+
+		ReservationDao reservationDao = getReservationDao();
+		Reservation reservation = reservationDao.getReservation(reservationNumber);
+		//If corresponding reservation does not exist
+		if (reservation == null) {
+			ReservationException exception = new ReservationException(
+					ReservationException.CODE_RESERVATION_NOT_FOUND);
+			exception.getDetailMessages().add("reservation_number[" + reservationNumber + "]");
+			throw exception;
+		}
+		//If reservation has been consumed already
+		if (reservation.getStatus().equals(Reservation.RESERVATION_STATUS_CONSUME)) {
+			ReservationException exception = new ReservationException(
+					ReservationException.CODE_RESERVATION_ALREADY_CONSUMED);
+			exception.getDetailMessages().add("reservation_number[" + reservationNumber + "]");
+			throw exception;
+		}
+		//If reservation has been canceled already
+		if (reservation.getStatus().equals(Reservation.RESERVATION_STATUS_CANCEL)) {
+			ReservationException exception = new ReservationException(
+					ReservationException.CODE_RESERVATION_ALREADY_CONSUMED);
+			exception.getDetailMessages().add("reservation_number[" + reservationNumber + "]");
+			throw exception;
+		}
+
+		reservation.setStatus(Reservation.RESERVATION_STATUS_CANCEL);
+		reservationDao.updateReservation(reservation);
+		return reservation.getStayingDate();
+	}
+
 	private ReservationDao getReservationDao() {
 		return DaoFactory.getInstance().getReservationDao();
 	}
