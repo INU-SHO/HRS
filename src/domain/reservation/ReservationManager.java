@@ -63,7 +63,14 @@ public class ReservationManager {
 			exception.getDetailMessages().add("reservation_number[" + reservationNumber + "]");
 			throw exception;
 		}
-
+		//if reservation were canceled
+		if (reservation.getStatus().equals(Reservation.RESERVATION_STATUS_CANCEL)) {
+			ReservationException exception = new ReservationException(
+					ReservationException.CODE_RESERVATION_CANCELED);
+			exception.getDetailMessages().add("reservation_number[" + reservationNumber + "]");
+			throw exception;
+		}
+		
 		Date stayingDate = reservation.getStayingDate();
 		reservation.setStatus(Reservation.RESERVATION_STATUS_CONSUME);
 		reservationDao.updateReservation(reservation);
@@ -95,7 +102,7 @@ public class ReservationManager {
 		//If reservation has been canceled already
 		if (reservation.getStatus().equals(Reservation.RESERVATION_STATUS_CANCEL)) {
 			ReservationException exception = new ReservationException(
-					ReservationException.CODE_RESERVATION_ALREADY_CONSUMED);
+					ReservationException.CODE_RESERVATION_NOT_FOUND);
 			exception.getDetailMessages().add("reservation_number[" + reservationNumber + "]");
 			throw exception;
 		}
@@ -109,3 +116,4 @@ public class ReservationManager {
 		return DaoFactory.getInstance().getReservationDao();
 	}
 }
+
