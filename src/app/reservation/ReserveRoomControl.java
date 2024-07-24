@@ -45,6 +45,32 @@ public class ReserveRoomControl {
 		}
 	}
 
+	public void cancelReservation(String reservationNumber) throws AppException {
+		//Permitting only one night so that change amount of availableQty is always 1
+		int availableQtyOfChange = 1;
+		try {
+			//Cancel reservation
+			ReservationManager reservationManager = getReservationManager();
+			Date stayingDate = reservationManager.cancelReservation(reservationNumber);
+
+			//Update number of available rooms
+			RoomManager roomManager = getRoomManager();
+			roomManager.updateRoomAvailableQty(stayingDate, availableQtyOfChange);
+		}
+		catch (RoomException e) {
+			AppException exception = new AppException("Failed to reserve", e);
+			exception.getDetailMessages().add(e.getMessage());
+			exception.getDetailMessages().addAll(e.getDetailMessages());
+			throw exception;
+		}
+		catch (ReservationException e) {
+			AppException exception = new AppException("Failed to reserve", e);
+			exception.getDetailMessages().add(e.getMessage());
+			exception.getDetailMessages().addAll(e.getDetailMessages());
+			throw exception;
+		}
+	}
+
 	private RoomManager getRoomManager() {
 		return ManagerFactory.getInstance().getRoomManager();
 	}
